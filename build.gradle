@@ -1,0 +1,12 @@
+plugins {
+    id 'net.researchgate.release' version '3.0.2'
+    id 'uk.gov.laa.ccms.springboot.laa-ccms-spring-boot-gradle-plugin' version '0.0.8' apply false
+}
+
+subprojects {
+    group = 'uk.gov.laa.apply.for.legal.aid'
+
+    release {
+        tagTemplate = '$name-$version'
+    }
+}

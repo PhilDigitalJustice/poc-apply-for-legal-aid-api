@@ -1,0 +1,59 @@
+server:
+  port: 8026
+
+# ===============================
+# = DATA MIGRATION
+# ===============================
+flyway:
+  baseline-on-migrate: true
+  url: jdbc:postgresql://localhost:5432/postgres
+  username: postgres_user
+  password: postgres_password
+
+spring:
+  # ===============================
+  # = DATASOURCE
+  # ===============================
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres_user
+    password: postgres_password
+    driverClassName: org.postgresql.Driver
+    test-on-borrow: true
+    test-while-idle: true
+    maxActive: 10
+    readOnly: false
+
+  # ===============================
+  # = JPA / HIBERNATE
+  # ===============================
+  jpa:
+    # Show or not log for each sql query
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        # Allows Hibernate to generate SQL optimized for a particular DBMS
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+laa.ccms.springboot.starter.auth:
+  authentication-header: "Authorization"
+  authorized-clients: '[
+      {
+          "name": "civil-apply",
+          "roles": [
+              "ALL"
+          ],
+          "token": "c196393a-f279-45ba-b5d5-f93e6d30465b"
+      }
+  ]'
+  authorized-roles: '[
+      {
+          "name": "ALL",
+          "URIs": [
+              "/**"
+          ]
+      }
+  ]'
+  unprotected-uris: [ "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico", "/open-api-specification.yml", "/**"]

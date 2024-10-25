@@ -1,0 +1,67 @@
+plugins {
+    id 'org.openapi.generator' version '7.0.1'
+}
+
+apply plugin: 'uk.gov.laa.ccms.springboot.laa-ccms-spring-boot-gradle-plugin'
+
+dependencies {
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.data:spring-data-commons'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+sourceSets.main.java.srcDirs += ['generated/src/main/java']
+
+checkstyleMain.exclude "*"
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/legal-aid-api/open-api-specification.yml".toString() // Change this to the location of your OpenAPI specification
+    outputDir = "$rootDir/legal-aid-api/generated".toString()
+    apiPackage = "uk.gov.laa.legal.aid.api"
+    modelPackage = "uk.gov.laa.legal.aid.model"
+    invokerPackage = "uk.gov.laa.legal.aid.invoker"
+    configOptions = [
+            delegatePattern       : "false",
+            interfaceOnly         : "true", // This will only generate interfaces, not implementations
+            useTags               : "true",
+            skipDefaultInterface  : "true",
+            useJakartaEe          : "true",
+            documentationProvider : "none",
+            serializableModel     : "true",
+            annotationLibrary     : "swagger2",
+            useSpringBoot3        : "true"
+    ]
+}
+
+compileJava.dependsOn 'openApiGenerate'
+
+clean {
+    delete "$rootDir/legal-aid-api/generated"
+}
+
+// disable for overall project when running a build
+tasks.named('bootJar') {
+    enabled = false
+}
+
+tasks.named('bootRun') {
+    enabled = false
+}
+
+
+

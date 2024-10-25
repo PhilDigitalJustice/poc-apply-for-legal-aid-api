@@ -1,0 +1,208 @@
+openapi: '3.0.0'
+info:
+  title: 'laa-apply-for-legal-aid-api'
+  version: '1.0.0'
+
+paths:
+  /applications:
+    get:
+      tags:
+        - applications
+      summary: 'Get list of legal aid applications with pagination'
+      description: 'Returns a paginated list of all legal aid applications'
+      operationId: 'getApplications'
+      x-spring-paginated: true
+      responses:
+        '200':
+          description: 'A paginated response of legal aid applications'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/applications'
+        '401':
+          description: 'Unauthorised - Invalid API Key'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Application not found'
+        '500':
+          description: 'Internal server error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /applications/{id}:
+    get:
+      tags:
+        - applications
+      summary: 'Get a legal aid application by ID'
+      description: 'Returns a single legal aid application along with its applicant, provider, office, and proceeding details'
+      operationId: 'getApplicationById'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 'A legal aid application with related details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application'
+        '401':
+          description: 'Unauthorised - Invalid API Key'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid API Key'
+        '404':
+          description: 'Application not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Application not found'
+        '500':
+          description: 'Internal server error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+components:
+  schemas:
+    page:
+      type: object
+      properties:
+        total_pages:
+          type: integer
+          example: 5
+        total_elements:
+          type: integer
+          example: 50
+        number:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 10
+
+    applications:
+      allOf:
+        - $ref: '#/components/schemas/page'
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/application'
+
+    application:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        applicationRef:
+          type: string
+          example: 'APP-001'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T12:00:00Z'
+        applicant:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: '123e4567-e89b-12d3-a456-426614174000'
+            firstName:
+              type: string
+              example: 'John'
+            lastName:
+              type: string
+              example: 'Doe'
+            dateOfBirth:
+              type: string
+              format: date
+              example: '1980-01-01'
+        provider:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: '123e4567-e89b-12d3-a456-426614174000'
+            username:
+              type: string
+              example: 'providerUser'
+            email:
+              type: string
+              example: 'provider@example.com'
+        office:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: '123e4567-e89b-12d3-a456-426614174000'
+            code:
+              type: string
+              example: 'OFF-123'
+            firm:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: '123e4567-e89b-12d3-a456-426614174000'
+                name:
+                  type: string
+                  example: 'Legal Aid Firm'
+        proceedings:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: '123e4567-e89b-12d3-a456-426614174000'
+              ccmsCode:
+                type: string
+                example: 'CCMS-001'
+              meaning:
+                type: string
+                example: 'Court proceeding'
+              substantiveCostLimitation:
+                type: number
+                format: decimal
+                example: 10000.00
+
+security:
+  - ApiKeyAuth: []
